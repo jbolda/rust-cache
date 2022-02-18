@@ -24,10 +24,10 @@ jobs:
           profile: minimal
           toolchain: stable
 
-    - name: install webkit2gtk (ubuntu only)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y webkit2gtk-4.0
+      - name: install webkit2gtk (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.0
 
       - run: npm install
       - uses: Swatinem/rust-cache@v1
