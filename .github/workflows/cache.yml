@@ -48,9 +48,7 @@ jobs:
           toolchain: stable
 
       - name: install webkit2gtk (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0
+        run: sudo apt-get install -y webkit2gtk-4.0
 
       - name: Cache cargo state
         uses: actions/cache@v2
@@ -95,9 +93,7 @@ jobs:
           toolchain: stable
 
       - name: install webkit2gtk (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0
+        run: sudo apt-get install -y webkit2gtk-4.0
 
       - name: Cache cargo state
         uses: actions/cache@v2
@@ -113,7 +109,7 @@ jobs:
             ubuntu-latest-registry-
 
       # install command to help with cache
-      - run: cargo install cargo-chef
+      - run: cargo install cargo-chef || true
       - run: cargo chef prepare --recipe-path recipe.json
 
       - name: Cache cargo target
@@ -150,9 +146,7 @@ jobs:
           toolchain: stable
 
       - name: install webkit2gtk (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0
+        run: sudo apt-get install -y webkit2gtk-4.0
 
       - name: Cache cargo state
         uses: actions/cache@v2
@@ -168,7 +162,7 @@ jobs:
             ubuntu-latest-registry-
 
       # install command to help with cache
-      - run: cargo install cargo-chef
+      - run: cargo install cargo-chef || true
       - run: cargo chef prepare --recipe-path recipe.json
 
       - name: Cache cargo target
