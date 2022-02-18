@@ -80,8 +80,63 @@ jobs:
       - run: npm install
       - run: npm run tauri build
 
-  cargo-chef:
+  cargo-chef-setup-cache:
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+
+      # selecting a toolchain either by action or manual `rustup` calls should happen
+      # before the plugin, as it uses the current rustc version as its cache key
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: install webkit2gtk (ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.0
+
+      - name: Cache cargo state
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+          key: ubuntu-latest-stable-registry-${{ hashFiles('**/Cargo.lock') }}-
+          restore-keys: |
+            ubuntu-latest-stable-registry-${{ hashFiles('**/Cargo.lock') }}-
+            ubuntu-latest-stable-registry-
+            ubuntu-latest-registry-
+
+      # install command to help with cache
+      - run: cargo install cargo-chef
+      - run: cargo chef prepare --recipe-path recipe.json
+
+      - name: Cache cargo target
+        uses: actions/cache@v2
+        with:
+          path: src-tauri/target
+          # Add date to the cache to keep it up to date
+          key: ubuntu-latest-stable-target-${{ hashFiles('recipe.json') }}-
+          # Restore from outdated cache for speed
+          restore-keys: |
+            ubuntu-latest-stable-target-${{ hashFiles('recipe.json') }}-
+            ubuntu-latest-stable-target-
+            ubuntu-latest-target-
+
+      - run: npm install
+
+      - run: cargo chef prepare --recipe-path recipe.json
+      # post step for actions/cache does the cache of the `target` dir
+      # created by chef prepare which only includes the dependencies
+
+  cargo-chef-build:
+    runs-on: ubuntu-latest
+    needs: [cargo-chef-setup-cache]
 
     steps:
       - uses: actions/checkout@v2
