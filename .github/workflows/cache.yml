@@ -25,9 +25,7 @@ jobs:
           toolchain: stable
 
       - name: install webkit2gtk (ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0
+        run: sudo apt-get install -y webkit2gtk-4.0
 
       - run: npm install
       - uses: Swatinem/rust-cache@v1
@@ -48,14 +46,41 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-      # install command to help with cache
-      - run: cargo install cargo-chef
 
       - name: install webkit2gtk (ubuntu only)
         run: |
           sudo apt-get update
           sudo apt-get install -y webkit2gtk-4.0
 
+      - name: Cache cargo state
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+          key: ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-
+          restore-keys: |
+            ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-
+            ubuntu-latest-stable-
+            ubuntu-latest-
+
+      # install command to help with cache
+      - run: cargo install cargo-chef
+      - run: cargo chef prepare --recipe-path recipe.json
+
+      - name: Cache cargo target
+        uses: actions/cache@v2
+        with:
+          path: src-tauri/target
+          # Add date to the cache to keep it up to date
+          key: ubuntu-latest-stable-${{ hashFiles('recipe.json') }}-
+          # Restore from outdated cache for speed
+          restore-keys: |
+            ubuntu-latest-stable-${{ hashFiles('recipe.json') }}-
+            ubuntu-latest-stable-
+            ubuntu-latest-
+
       - run: npm install
 
-      - run: cargo chef prepare --recipe-path recipe.json
+      - run: npm run tauri build
