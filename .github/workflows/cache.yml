@@ -130,7 +130,7 @@ jobs:
 
       - run: npm install
 
-      - run: cargo chef prepare --recipe-path recipe.json
+      - run: cargo chef cook --release --recipe-path recipe.json
       # post step for actions/cache does the cache of the `target` dir
       # created by chef prepare which only includes the dependencies
 
