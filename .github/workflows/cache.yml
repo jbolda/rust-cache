@@ -127,6 +127,7 @@ jobs:
       - run: npm install
 
       - run: cargo chef cook --release --recipe-path recipe.json
+        working-directory: src-tauri
       # post step for actions/cache does the cache of the `target` dir
       # created by chef prepare which only includes the dependencies
 
